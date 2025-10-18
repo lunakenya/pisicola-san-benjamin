@@ -1,0 +1,74 @@
+.wrap{ padding:18px 20px; display:flex; flex-direction:column; gap:18px; }
+.controls{ display:flex; align-items:center; gap:16px; }
+
+.searchBox{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border);
+    padding:10px 14px; border-radius:999px; box-shadow:var(--shadow-sm); width:720px; max-width:100%; }
+.searchIcon{ color:var(--brand-2); font-size:18px; }
+.searchInput{ border:none; outline:none; font-size:14px; flex:1; background:transparent; color:var(--text-main); }
+
+.psizeLabel{ display:inline-flex; gap:8px; align-items:center; font-size:13px; color:var(--text-muted); }
+.psizeSelect{ border:1px solid var(--border); background:#fff; border-radius:8px; padding:6px 8px; font-size:13px; color:var(--text-main); }
+
+.actionButtons{ margin-left:auto; display:flex; gap:10px; align-items:center; }
+.counter{ font-size:13px; color:var(--text-muted); margin-right:6px; }
+.iconButton{ display:inline-grid; place-items:center; width:36px; height:36px; border-radius:8px; border:1px solid rgba(0,0,0,.06);
+    background:#fff; cursor:pointer; font-size:16px; color:var(--brand-2); box-shadow:var(--shadow-sm); }
+.iconButton:hover{ transform:translateY(-2px); }
+.roundButton{ display:inline-grid; place-items:center; width:36px; height:36px; border-radius:8px; background:#0f8b44; color:#fff; border:none; cursor:pointer; font-size:16px; box-shadow:var(--shadow-md); }
+.roundButton:hover{ transform:translateY(-2px); }
+
+.tableCard{ margin-top:6px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:0; box-shadow:var(--shadow-sm); overflow:hidden; }
+
+.table{ width:100%; border-collapse:collapse; font-size:14px; }
+.table thead tr{ background:#fafbfd; }
+.table thead th{ padding:12px 16px; text-align:left; font-weight:600; color:var(--text-muted); border-bottom:1px solid rgba(0,0,0,.04); }
+.table tbody tr{ border-top:1px solid rgba(0,0,0,.03); background:#fff; }
+.cell{ padding:12px 16px; color:var(--text-main); }
+.cellCenter{ padding:12px 16px; text-align:center; color:var(--text-main); }
+.cellActions{ padding:8px 12px; display:flex; gap:8px; justify-content:flex-end; align-items:center; }
+
+.smallBtn{ display:flex; gap:8px; align-items:center; padding:6px 8px; font-size:13px; background:#fff; border:1px solid rgba(0,0,0,.08);
+    color:var(--text-main); border-radius:6px; cursor:pointer; }
+.smallBtn svg{ font-size:14px; }
+.smallBtnAlt{ padding:5px 8px; font-size:13px; background:#fff; border:1px solid rgba(0,0,0,.08); color:var(--text-muted); border-radius:6px; cursor:pointer; }
+
+.emptyRow{ padding:20px; color:var(--text-muted); text-align:center; }
+
+.pager{ display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-top:1px solid rgba(0,0,0,.04); background:#fafbfd; }
+.pagerBtn{ min-width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:#fff; cursor:pointer; }
+.pagerBtn:disabled{ opacity:.5; cursor:not-allowed; }
+.pagerStatus{ display:inline-flex; gap:8px; align-items:center; font-size:13px; color:var(--text-muted); }
+.pagerInput{ width:54px; text-align:center; border:1px solid var(--border); border-radius:8px; height:32px; background:#fff; color:var(--text-main); }
+
+.modalOverlay{ position:fixed; inset:0; display:grid; place-items:center; background:rgba(8,12,16,.45); z-index:1200; padding:24px; }
+.modal{ width:520px; max-width:100%; background:#fff; border-radius:10px; padding:18px; box-shadow:0 14px 40px rgba(10,20,40,.3); box-sizing:border-box; }
+.modalTitle{ margin:0 0 8px; font-size:18px; font-weight:700; color:var(--text-main); }
+.formLabel{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; font-size:13px; color:var(--text-main); }
+.input{ padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface); outline:none; font-size:14px; width:100%; box-sizing:border-box; }
+.formError{ color:#b91c1c; background:rgba(185,28,28,.06); padding:8px 10px; border-radius:6px; margin-bottom:8px; font-size:13px; }
+.modalActions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
+.btnPrimary{ background:#0f8b44; color:#fff; padding:8px 12px; font-weight:600; border-radius:8px; border:none; cursor:pointer; min-width:110px; }
+.btnPrimary[disabled]{ opacity:.6; cursor:not-allowed; }
+.btnSecondary{ background:transparent; color:var(--text-main); padding:8px 12px; border-radius:8px; border:1px solid rgba(10,20,35,.06); }
+
+.skelRow{ display:flex; gap:12px; align-items:center; }
+.skelBlock{ height:12px; border-radius:8px; }
+.shimmer{ background:linear-gradient(90deg, rgba(220,225,230,.2) 25%, rgba(220,225,230,.45) 37%, rgba(220,225,230,.2) 63%);
+    background-size:400% 100%; animation:shimmer 1.2s ease-in-out infinite; }
+@keyframes shimmer{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+.rowDim{ opacity:.55; }
+
+.resetPassBox{ display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+.checkRow{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-main); }
+
+@media (max-width:900px){
+    .controls{ flex-direction:column; align-items:stretch; gap:10px; }
+    .searchBox{ width:100%; }
+    .actionButtons{ margin-left:0; justify-content:flex-end; }
+}
+/* Mensaje de error bajo cada campo */
+.fieldError{
+    color:#b91c1c;
+    font-size:12px;
+    margin-top:2px;
+}

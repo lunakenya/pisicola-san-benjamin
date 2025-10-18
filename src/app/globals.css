@@ -1,26 +1,100 @@
-@import "tailwindcss";
+/* Altura completa y bloqueo del scroll global */
+html, body { height: 100%; }
+body { overflow: hidden; }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Reset básico y tipografía */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+
+/* Design tokens globales */
+:root{
+  --brand: #159CBC;
+  --brand-2: #0F7FA3;
+  --tile-radius: 8px;
+  --brand-green: #0c4a3b;
+  --sidebar-bg-2: #0c3f34;
+  --logo-size: 180px;
+  --tile-height: 84px;
+  --sidebar-bg: #0d4c3b;
+  --text-on-sidebar: #fff;
+  --divider: rgba(255,255,255,0.06);
+  --bg: #f6f8fb;
+  --radius: 8px;
+  --shadow-sm: 0 1px 4px rgba(10,37,64,0.04);
+  --shadow-md: 0 6px 18px rgba(10,37,64,0.08);
+  --topbar-padding-x: 20px;
+  --topbar-time-left: 10px;
+  --topbar-gap: 12px;
+  --surface: #ffffff;
+  --border: rgba(10,37,64,.08);
+  --text-main: #0a2540;
+  --text-muted: #5a6b7c;
+
+  /* Layout (ajusta según tu app) */
+  --sidebar-width: 200px;
+  --content-left-gap: 24px;
+  --topbar-height: 64px;
+  --topbar-time-left-calc: calc(var(--sidebar-width) + var(--content-left-gap));
+  --topbar-time-width: 300px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Utilidades generales */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+/* Altura completa y bloqueo del scroll global */
+html, body { height: 100%; }
+body { overflow: hidden; }
+
+/* Reset básico y tipografía */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+
+/* Design tokens globales */
+:root{
+  --brand: #159CBC;
+  --brand-2: #0F7FA3;
+  --tile-radius: 8px;
+  --brand-green: #0c4a3b;
+  --sidebar-bg-2: #0c3f34;
+  --logo-size: 180px;
+  --tile-height: 84px;
+  --sidebar-bg: #0d4c3b;
+  --text-on-sidebar: #fff;
+  --divider: rgba(255,255,255,0.06);
+  --bg: #f6f8fb;
+  --radius: 8px;
+  --shadow-sm: 0 1px 4px rgba(10,37,64,0.04);
+  --shadow-md: 0 6px 18px rgba(10,37,64,0.08);
+  --topbar-padding-x: 20px;
+  --topbar-time-left: 10px;
+  --topbar-gap: 12px;
+  --surface: #ffffff;
+  --border: rgba(10,37,64,.08);
+  --text-main: #0a2540;
+  --text-muted: #5a6b7c;
+
+  /* Layout (ajusta según tu app) */
+  --sidebar-width: 200px;
+  --content-left-gap: 24px;
+  --topbar-height: 64px;
+  --topbar-time-left-calc: calc(var(--sidebar-width) + var(--content-left-gap));
+  --topbar-time-width: 300px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Utilidades generales */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
 }

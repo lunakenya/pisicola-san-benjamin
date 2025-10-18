@@ -1,0 +1,288 @@
+/* Contenedor con fondo: ahora se ve COMPLETO (contain) */
+.container {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: clamp(48px, 9vw, 120px);
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+
+    /* Fondo completo sin recortar */
+    background-image: url('/images/fondo.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;       /* <-- muestra toda la imagen */
+    background-color: #eaeff3;      /* color de “letterbox” si sobra espacio */
+}
+
+/* Card glass (ligeramente más alta, menos ancha) */
+.card {
+    display: flex;
+    width: 820px;    /* menos ancha */
+    height: 460px;   /* un poco más alta */
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.18);
+}
+
+/* Panel izquierdo: imagen + logo centrado */
+.left {
+    position: relative;
+    width: 46%;
+    min-width: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cardImage {
+    position: absolute !important;
+    inset: 0;
+    object-fit: cover;
+}
+.logo {
+    position: relative;
+    width: 250px;   /* logo más pequeño */
+    height: 250px;
+    z-index: 1;
+}
+
+/* Panel derecho (título un poco más arriba) */
+.right {
+    width: 54%;
+    padding: 26px 34px;            /* sube todo un poco */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.86) 100%);
+}
+.welcome {
+    font-size: 24px;
+    font-weight: 600;
+    color: #000;
+    margin: -8px 0 18px 0;          /* más arriba */
+}
+.benjamin { color: var(--green-text); }
+
+/* Formulario */
+.form {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;                      /* +espacio general */
+    align-items: center;
+}
+
+/* Fila de input con icono a la izquierda y ojo a la derecha */
+.row {
+    width: 100%;
+    position: relative;
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    align-items: center;
+    column-gap: 12px;
+}
+
+/* Icono izquierda */
+.leftIcon {
+    font-size: 20px;
+    color: #2E2E2E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Input pill con sombra suave */
+.input {
+    width: 100%;
+    height: 46px;
+    padding: 10px 44px 10px 14px;   /* deja espacio a la derecha para el ojo */
+    border: 1px solid #E6E6E6;
+    border-radius: 9999px;
+    background: #FFFFFF;
+    font-size: 15px;
+    outline: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.14);
+}
+.input::placeholder { color: #9AA3AF; }
+
+/* Botón ojo (mostrar/ocultar) a la derecha dentro del input */
+.eyeBtn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 32px;
+    width: 32px;
+    border: none;
+    background: transparent;
+    color: #56616B;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Enlace recuperación */
+.forgot {
+    align-self: flex-end;
+    margin-top: -2px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--green-text);
+    text-decoration: none;
+}
+
+/* Botón centrado, con más aire arriba (como “enter”) */
+.loginButton {
+    width: 240px;
+    height: 48px;
+    margin-top: 12px;              /* más espacio arriba */
+    background: var(--green-button);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter .2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+.loginButton:hover { filter: brightness(0.92); }
+
+/* Responsive */
+@media (max-width: 960px) {
+    .container { padding-left: 24px; background-size: cover; } /* en móvil, mejor cubrir */
+    .card { width: 92%; height: 460px; }
+    .left { display: none; }
+    .right { width: 100%; padding: 24px; }
+    .form { width: 100%; }
+    .loginButton { width: 100%; }
+}
+.loginButton[disabled] {
+    opacity: .7;
+    cursor: not-allowed;
+}
+/* Nota pequeña debajo del botón */
+.subNote {
+    margin-top: 8px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+/* Fila de enlaces secundarios en formularios */
+.linksRow {
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.backLink {
+    color: #374151;
+    font-size: 13px;
+    text-decoration: none;
+}
+.backLink:hover { text-decoration: underline; }
+/* ====== Card centrada (sin panel izquierdo) ====== */
+.containerCenter {
+    position: relative;
+    height: 100vh; width: 100vw;
+    display: grid; place-items: center;
+    font-family: 'Poppins', sans-serif;
+    background-image: url('/images/fondo.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-color: #eaeff3;
+}
+
+.singleCard {
+    width: 480px; max-width: 92vw;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 14px 40px rgba(10, 20, 40, 0.25);
+    border: 1px solid rgba(0,0,0,0.06);
+    padding: 20px 22px 18px;
+}
+
+.singleHeader {
+    display: grid; place-items: center;
+    gap: 8px; margin-bottom: 8px;
+}
+
+.titleCenter {
+    margin: 6px 0 0; font-size: 20px; font-weight: 700; color: #111827;
+    text-align: center;
+}
+
+.singleForm {
+    display: flex; flex-direction: column; gap: 12px; margin-top: 6px;
+}
+
+.singleLabel {
+    display: grid; gap: 6px; font-size: 13px; color: #111827;
+}
+
+.btnPrimaryWide {
+    background: var(--green-button);
+    color: #fff; border: none; border-radius: 10px;
+    font-weight: 700; height: 46px;
+    cursor: pointer; transition: filter .2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+.btnPrimaryWide[disabled] { opacity: .7; cursor: not-allowed; }
+.btnPrimaryWide:hover { filter: brightness(0.92); }
+/* Layout centrado con fondo */
+.containerCenter{
+    position:relative;height:100vh;width:100vw;display:grid;place-items:center;
+    font-family:'Poppins',sans-serif;
+    background-image:url('/images/fondo.png');background-repeat:no-repeat;background-position:center;background-size:cover;background-color:#eaeff3;
+}
+
+/* Card más grande y simple */
+.singleCardLarge{
+    width:560px;max-width:94vw;background:#fff;border-radius:16px;
+    box-shadow:0 16px 48px rgba(10,20,40,.28);border:1px solid rgba(0,0,0,0.06);
+    padding:26px 24px 22px;
+}
+
+.titleCenter{ margin:0 0 10px; font-size:22px; font-weight:800; color:#111827; text-align:center; }
+
+.singleForm{ display:flex; flex-direction:column; gap:14px; margin-top:4px; }
+.singleLabel{ display:grid; gap:6px; font-size:13px; color:#111827; }
+
+.btnPrimaryWide{
+    background:var(--green-button); color:#fff; border:none; border-radius:12px; font-weight:800;
+    height:48px; cursor:pointer; transition:filter .2s ease; box-shadow:0 4px 12px rgba(0,0,0,.14);
+}
+.btnPrimaryWide:hover{ filter:brightness(.92); }
+.btnPrimaryWide[disabled]{ opacity:.7; cursor:not-allowed; }
+
+/* Enlaces: dispersos a los lados, y botón regresar visible */
+.linksRowSpread{
+    margin-top:6px; display:flex; justify-content:space-between; align-items:center;
+}
+.linksRowRight{
+    margin-top:6px; display:flex; justify-content:flex-end; align-items:center; gap:10px;
+}
+
+.backButton{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:8px 12px; height:40px; border-radius:10px; border:1px solid #e5e7eb;
+    background:#fff; color:#111827; font-weight:600; text-decoration:none; box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+.backButton:hover{ background:#f9fafb; }
+
+.linkStrong{ color:#0f8b44; font-weight:700; text-decoration:none; }
+.linkStrong:hover{ text-decoration:underline; }
+
+.linkSoft{ color:#2563eb; text-decoration:none; font-weight:600; }
+.linkSoft:hover{ text-decoration:underline; }

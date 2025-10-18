@@ -1,0 +1,47 @@
+@host = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJzb3BvcnRlc2FuYmVuamFtaW5AZ21haWwuY29tIiwicm9sZSI6IlNVUEVSQURNSU4iLCJpYXQiOjE3NTkyMDc5NDgsImV4cCI6MTc1OTIxNTE0OH0.5-oBvUbj-_pYNVfuudrfkRbDtRHHRbr_tAa5YotOsqU
+
+### ─────────────────────────────────────────────────────────
+### Crear proveedor
+POST {{host}}/api/providers
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Proveedor Ejemplo",
+  "ruc": "1799999999001"
+}
+### ─────────────────────────────────────────────────────────
+### Listar activos
+GET {{host}}/api/providers?q=ejemplo&page=1&pageSize=10
+Authorization: Bearer {{token}}
+### ─────────────────────────────────────────────────────────
+### Listar incluyendo inactivos (soft-deleted)
+GET {{host}}/api/providers?q=&page=1&pageSize=10&includeInactive=true
+Authorization: Bearer {{token}}
+
+### ─────────────────────────────────────────────────────────
+### Editar (PUT) — cambia el :id por uno real devuelto en "Crear" o "Listar"
+PUT {{host}}/api/providers/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Proveedor Actualizado",
+  "ruc": "1799999999001"
+}
+
+### ─────────────────────────────────────────────────────────
+### Inactivar (soft delete) — deja active=false
+DELETE {{host}}/api/providers/1
+Authorization: Bearer {{token}}
+
+### ─────────────────────────────────────────────────────────
+### Restaurar (PATCH) — vuelve a active=true
+PATCH {{host}}/api/providers/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "active": true
+}

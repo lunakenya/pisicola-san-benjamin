@@ -1,0 +1,50 @@
+.app {
+    display: flex;
+    /* clave: ocupar la ventana y bloquear scroll aquí */
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    /* clave: ocupar la ventana y NO dejar que se expanda más alto */
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* aquí vive el scroll de cada página */
+.page {
+    flex: 1;
+    overflow: auto;     /* solo el contenido scrollea */
+    padding: 24px;
+    min-width: 0;       /* evita overflows horizontales con tablas anchas */
+}
+.app {
+    display: flex;
+    /* clave: ocupar la ventana y bloquear scroll aquí */
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    /* clave: ocupar la ventana y NO dejar que se expanda más alto */
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* aquí vive el scroll de cada página */
+.page {
+    flex: 1;
+    overflow: auto;     /* solo el contenido scrollea */
+    padding: 24px;
+    min-width: 0;       /* evita overflows horizontales con tablas anchas */
+}

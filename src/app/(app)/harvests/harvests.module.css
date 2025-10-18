@@ -1,0 +1,340 @@
+/* container */
+.wrap {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* header */
+.headerControls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.mainTitle {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+.mainActions { display: inline-flex; align-items: center; gap: 10px; }
+.counter { font-size: 13px; color: var(--text-muted); margin-right: 6px; }
+.iconButton {
+    display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.06); background: #fff; cursor: pointer;
+    font-size: 16px; color: var(--brand-2); box-shadow: var(--shadow-sm);
+}
+.primaryButton {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 12px;
+    border-radius: 8px; border: none; cursor: pointer;
+    background: #0f8b44; color: #fff; font-weight: 600;
+    box-shadow: var(--shadow-md);
+}
+.primaryButton svg { font-size: 16px; }
+
+/* filters */
+.filtersCard {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 14px 18px;
+    align-items: end;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: var(--shadow-sm);
+}
+.filterGroup { display: flex; flex-direction: column; gap: 6px; }
+.filterLabel { font-size: 13px; color: var(--text-muted); }
+.dateRangePicker { display: flex; align-items: center; gap: 10px; }
+.select { border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 8px 10px; font-size: 14px; color: var(--text-main); }
+
+/* search full */
+.searchBoxFull {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+}
+.searchBoxFull .searchIcon { color: var(--brand-2); font-size: 18px; }
+.searchBoxFull .searchInput {
+    border: none; outline: none; font-size: 14px; flex: 1; background: transparent; color: var(--text-main);
+}
+
+/* summary card */
+.summaryCard { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.cardTitle { margin: 0 0 2px; font-size: 16px; font-weight: 700; color: var(--text-main); }
+.cardSubtitle { margin: 0 0 10px; font-size: 12px; color: var(--text-muted); }
+.tableContainer { width: 100%; overflow-x: auto; }
+.summaryTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.summaryTable thead th {
+    background: #fafbfd;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.summaryTable tbody td,
+.summaryTable tfoot td {
+    padding: 10px 12px;
+    border-top: 1px solid rgba(0,0,0,0.03);
+    color: var(--text-main);
+    background: #fff;
+}
+.summaryTable tfoot td {
+    font-weight: 700;
+    background: #fbfcfe;
+}
+.loadingOverlay { padding: 14px; text-align: center; color: var(--text-muted); }
+
+/* table card */
+.tableCard {
+    margin-top: 6px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0; box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.tableActions {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 10px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    background: #fafbfd;
+}
+.psizeLabel { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text-muted); }
+.psizeSelect {
+    border: 1px solid var(--border); background: #fff; border-radius: 8px;
+    padding: 6px 8px; font-size: 13px; color: var(--text-main);
+}
+.checkboxLabel {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* table */
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table thead tr { background: #fafbfd; }
+.table thead th {
+    padding: 12px 16px; text-align: left; font-weight: 600;
+    color: var(--text-muted); border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.table tbody tr { border-top: 1px solid rgba(0,0,0,0.03); background: white; }
+.cell { padding: 12px 16px; color: var(--text-main); }
+.cellCenter { padding: 12px 16px; text-align: center; color: var(--text-main); }
+.cellActions {
+    padding: 8px 12px; display: flex; gap: 8px; justify-content: flex-end; align-items: center;
+}
+
+/* action buttons */
+.smallBtn {
+    display:flex; gap:8px; align-items:center;
+    padding:6px 8px; font-size:13px; background:#fff; border:1px solid rgba(0,0,0,0.08);
+    color:var(--text-main); border-radius:6px; cursor:pointer;
+}
+.smallBtn svg { font-size:14px; }
+.smallBtnAlt {
+    padding:5px 8px; font-size:13px; background:#fff; border:1px solid rgba(0,0,0,0.08);
+    color:var(--text-muted); border-radius:6px; cursor:pointer;
+}
+
+/* empty/loading */
+.emptyRow, .loading { padding: 20px; color: var(--text-muted); text-align: center; }
+
+/* pagination */
+.pager {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 12px; border-top: 1px solid rgba(0,0,0,0.04); background: #fafbfd;
+}
+.pagerBtn {
+    min-width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid var(--border); background: #fff; cursor: pointer;
+}
+.pagerBtn:disabled { opacity: .5; cursor: not-allowed; }
+.pagerStatus { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text-muted); }
+.pagerInput {
+    width: 54px; text-align: center; border: 1px solid var(--border);
+    border-radius: 8px; height: 32px; background: #fff; color: var(--text-main);
+}
+
+/* modal styles */
+.modalOverlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(8, 12, 16, 0.45); z-index: 1200; padding: 24px; }
+.modal {
+    width: 520px; max-width: 100%; background: white; border-radius: 10px; padding: 18px;
+    box-shadow: 0 14px 40px rgba(10, 20, 40, 0.3); box-sizing: border-box;
+}
+.modalWide { width: 820px; max-width: calc(100% - 40px); }
+.modalGrid { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; margin-top: 8px; }
+
+.modalTitle { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--text-main); }
+.modalText  { margin: 0 0 12px; color: var(--text-muted); }
+.formLabel { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; font-size: 13px; color: var(--text-main); }
+.input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
+
+.errorText { margin-top: 4px; font-size: 12px; color: #b91c1c; }
+.textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    outline: none;
+    font-size: 14px;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modalHeaderIcon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: var(--brand-green, #0c4a3b);
+    color: #fff; margin-bottom: 8px;
+    box-shadow: 0 6px 18px rgba(10,37,64,0.08);
+}
+.modalSubtitle { margin: 0 0 10px; color: var(--text-muted); font-size: 13px; }
+.modalActions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+.btnPrimary { background: #0f8b44; color: white; padding: 8px 12px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; min-width: 110px; }
+.btnSecondary { background: transparent; color: var(--text-main); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(10, 20, 35, 0.06); }
+
+/* pin input */
+.pinRow { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
+.pinInput {
+    width: 56px; height: 64px; text-align: center;
+    font-size: 28px; font-weight: 800; letter-spacing: 2px;
+    border-radius: 12px; border: 1.5px solid rgba(22,163,74,.35);
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    outline: none;
+}
+
+/* date input wrapper for CustomDateInput */
+.dateWrapper { position: relative; display: inline-block; }
+.dateInput {
+    width: 160px;
+    padding: 10px 34px 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-main);
+    outline: none;
+    font-size: 14px;
+}
+.dateIcon {
+    position: absolute;
+    right: 10px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 16px;
+    color: var(--brand-2);
+}
+.dateSeparator { color: var(--text-muted); font-size: 13px; }
+.datePreview { margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+
+/* react-datepicker & react-select adjustments */
+.wrap :global(.react-datepicker-popper) { z-index: 1500; }
+.wrap :global(.react-datepicker) { border-color: var(--border); box-shadow: var(--shadow-sm); }
+.wrap :global(.rs__control) { min-height: 40px; border-radius: 8px; border-color: var(--border); box-shadow: none; }
+.wrap :global(.rs__value-container) { padding: 4px 8px; }
+.wrap :global(.rs__menu) { z-index: 1600; }
+
+.skeletonRow {
+    height: 44px;
+    background: linear-gradient(90deg, rgba(220,225,230,0.2) 25%, rgba(220,225,230,0.45) 37%, rgba(220,225,230,0.2) 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+    border-radius: 6px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.rowDim { opacity: .55; }
+
+/* responsive */
+@media (max-width: 900px) {
+    .filtersCard { grid-template-columns: 1fr; }
+    .modalGrid { grid-template-columns: 1fr; }
+    .primaryButton { height: 36px; }
+}
+/* ==== Layout final: fecha a la izquierda, mes+acciones a la derecha ==== */
+
+.filtersCard {
+    display: grid;
+    /* primera columna toma el espacio disponible; segunda columna tiene ancho controlado */
+    grid-template-columns: 1fr minmax(260px, 420px);
+    gap: 14px 18px;
+    align-items: end;
+    justify-content: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Grupo del mes: label arriba, fila interna (select + acciones) debajo */
+.monthGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;      /* permite reducir en pantallas estrechas */
+    width: 100%;
+}
+
+/* fila interna: select a la izquierda, acciones a la derecha */
+.monthAndActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;            /* ocupa toda la columna derecha */
+    box-sizing: border-box;
+}
+
+/* empuja solo las acciones a la derecha dentro de monthAndActions */
+.monthAndActions .mainActions {
+    margin-left: auto;      /* <- esto coloca el badge + refrescar + botones a la derecha */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* controla ancho razonable del select dentro de la columna */
+.monthAndActions .select {
+    min-width: 160px;
+    flex: 0 0 auto;
+}
+
+/* tamaño coherente de botones */
+.monthAndActions .iconButton { width: 36px; height: 36px; }
+.monthAndActions .primaryButton { height: 36px; }
+
+/* asegurar que la búsqueda siga ocupando toda la fila cuando uses gridColumn inline style */
+.filterGroup[style*="gridColumn: 1 / -1"],
+.filtersCard > .filterGroup[style*="gridColumn: 1 / -1"] {
+    grid-column: 1 / -1;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    /* en pantallas medianas/pequeñas apilamos todo en una columna */
+    .filtersCard { grid-template-columns: 1fr; align-items: stretch; }
+    .monthAndActions { flex-direction: row; gap: 8px; }
+    .monthAndActions .select { flex: 1 1 auto; min-width: 0; }
+    .monthAndActions .mainActions { margin-left: 0; justify-content: flex-end; }
+}
+
+@media (max-width: 480px) {
+    /* en móviles apilamos verticalmente dentro del grupo mes */
+    .monthAndActions { flex-direction: column; align-items: stretch; gap: 8px; }
+    .monthAndActions .mainActions { width: 100%; justify-content: space-between; }
+}

@@ -1,0 +1,45 @@
+/* src/components/modal.module.css */
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(8, 12, 16, 0.45);
+    z-index: 1300;
+    padding: 20px;
+}
+
+/* Modal base */
+.modal {
+    width: 520px;
+    max-width: 100%;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 14px 40px rgba(10, 20, 40, 0.14);
+    box-sizing: border-box;
+    color: var(--text-main);
+}
+
+/* Título y texto */
+.modalTitle { margin: 0 0 8px; font-size: 18px; font-weight: 700; color: var(--text-main); }
+.modalText  { margin: 0 0 12px; color: var(--text-muted); }
+
+/* Form label / input */
+.formLabel { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; font-size: 13px; color: var(--text-main); }
+.input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); outline: none; font-size: 14px; width: 100%; box-sizing: border-box; }
+
+/* Mensajes de error */
+.formError { color: #b91c1c; background: rgba(185,28,28,0.06); padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
+
+/* Acciones */
+.modalActions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+.btnPrimary { background: #0f8b44; color: white; padding: 8px 12px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; min-width: 120px; }
+.btnSecondary { background: transparent; color: var(--text-main); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(10, 20, 35, 0.06); cursor: pointer; }
+
+/* responsive */
+@media (max-width: 640px) {
+    .modal { width: calc(100% - 32px); padding: 14px; }
+    .btnPrimary, .btnSecondary { min-width: 90px; padding: 8px 10px; }
+}

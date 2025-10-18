@@ -1,0 +1,47 @@
+/* Fondo con la misma imagen del login principal */
+.bg{
+    position:fixed; inset:0; display:grid; place-items:center;
+    background-image:url('/images/fondo.png');
+    background-size:cover; background-position:center; filter: none;
+}
+
+/* Card única, más grande, sin panel de logo */
+.card{
+    width:min(520px, 92vw);
+    background:#fff; border-radius:16px; padding:22px 22px 18px;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+
+.title{ margin:6px 0 14px; text-align:center; font-size:22px; font-weight:700; color:#0a0a0a;}
+
+.form{ display:flex; flex-direction:column; gap:12px; }
+
+.label{ display:flex; flex-direction:column; gap:6px; font-size:13px; color:#1f2937; }
+.input{
+    height:46px; border-radius:10px; border:1px solid #E6E6E6;
+    padding:10px 12px; background:#fff; font-size:15px; outline:none;
+    box-shadow:0 3px 8px rgba(0,0,0,0.10);
+}
+.input:disabled{ background:#f7f7f7; color:#6b7280; }
+
+.primaryBtn{
+    margin-top:6px; height:48px; border:none; border-radius:12px;
+    background: var(--green-button,#0f8b44); color:#fff; font-weight:700; font-size:16px;
+    cursor:pointer; transition: filter .2s ease;
+    box-shadow:0 8px 20px rgba(15,139,68,.28);
+}
+.primaryBtn:hover{ filter:brightness(.95); }
+.primaryBtn:disabled{ opacity:.6; cursor:not-allowed; }
+
+.note{ margin-top:6px; color:#6b7280; font-size:12px; text-align:center; }
+
+.actionsRow{
+    margin-top:8px; display:flex; justify-content:space-between; align-items:center;
+}
+.linkStrong{ color:#0f8b44; font-weight:700; text-decoration:none; }
+.backLink{ color:#374151; font-weight:600; text-decoration:none; }
+.backLink:hover, .linkStrong:hover { text-decoration:underline; }
+
+@media (max-width:480px){
+    .card{ width:90vw; padding:18px 16px; }
+}

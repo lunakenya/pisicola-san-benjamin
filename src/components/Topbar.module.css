@@ -1,0 +1,71 @@
+
+.topbar {
+    position: relative; /* necesario para .center absolute */
+    display: grid;
+    grid-template-columns: 1fr auto; /* título flexible + usuario a la derecha */
+    align-items: center;
+    height: var(--topbar-height);
+    padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-sizing: border-box;
+    gap: 12px;
+}
+
+/* izquierda: título */
+.left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+.title {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* HORA: posición absoluta independiente del título */
+.center {
+    position: absolute;
+    left: var(--topbar-time-left-calc); /* <--- controla la distancia desde el borde izquierdo (considera sidebar) */
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--topbar-time-width);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* si quieres que la hora quede pegada a la izquierda del bloque */
+    pointer-events: none; /* evita interferir con foco u otros elementos */
+}
+.time {
+    color: var(--text-main);
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.95;
+}
+
+/* derecha: usuario */
+.user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-main);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 15px;
+    justify-self: end;
+    z-index: 2; /* que quede por encima si solapa */
+}
+.userIcon { font-size: 20px; color: var(--text-muted); }
+
+/* responsive: en pantallas estrechas ocultar la hora fija */
+@media (max-width: 880px) {
+    .center { display: none; } /* oculta la hora para no romper layout */
+    .topbar { grid-template-columns: 1fr auto; padding: 0 12px; }
+    .title { font-size: 18px; }
+    .user { padding: 8px 10px; font-size: 14px; }
+}

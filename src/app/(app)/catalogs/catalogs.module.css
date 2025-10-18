@@ -1,0 +1,124 @@
+/* Wrapper: deja que el layout principal controle el ancho; aquí añado solo padding */
+.wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 12px 20px 28px;
+}
+
+/* GRID: tarjetas más grandes para que no quede vacío el espacio */
+.grid {
+    margin-top: 4px;
+    display: grid;
+    /* Tarjetas amplias; ocupan el ancho disponible y se adaptan */
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+/* Animación entrada (sutil) */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px) scale(.998); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow-sm);
+    transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s, border-color .12s;
+    transform-origin: center;
+    opacity: 0;
+    animation: fadeUp .34s cubic-bezier(.2,.9,.2,1) both;
+    min-height: 96px;
+}
+
+/* Hover más evidente */
+.card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 14px 36px rgba(10,37,64,0.09);
+    border-color: rgba(7,141,59,0.12);
+}
+
+/* Icon pill (agrandado) */
+.icon {
+    width: 76px;
+    height: 76px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    background: linear-gradient(180deg, rgba(7,141,59,0.04), rgba(21,156,188,0.01));
+    color: var(--brand-2);
+    border: 1px solid rgba(10,37,64,0.03);
+    flex-shrink: 0;
+    box-shadow: inset 0 -6px 14px rgba(0,0,0,0.02);
+}
+
+/* Contenido textual */
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+.label {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.desc {
+    font-size: 13px;
+    color: var(--muted);
+    opacity: .95;
+    line-height: 1.15;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Colores por tipo (ajusta si quieres otros tonos) */
+.card[data-type="providers"] .icon {
+    background: linear-gradient(180deg, rgba(21,156,188,0.06), rgba(7,141,59,0.01));
+    color: #0F7FA3;
+}
+.card[data-type="pools"] .icon {
+    background: linear-gradient(180deg, rgba(38,143,255,0.06), rgba(7,141,59,0.01));
+    color: #1E90FF;
+}
+.card[data-type="lots"] .icon {
+    background: linear-gradient(180deg, rgba(129,90,242,0.06), rgba(7,141,59,0.01));
+    color: #7B61FF;
+}
+.card[data-type="food"] .icon {
+    background: linear-gradient(180deg, rgba(255,203,84,0.06), rgba(7,141,59,0.01));
+    color: #D98E00;
+}
+.card[data-type="details"] .icon {
+    background: linear-gradient(180deg, rgba(88,118,255,0.06), rgba(7,141,59,0.01));
+    color: #3B4BFF;
+}
+.card[data-type="packages"] .icon {
+    background: linear-gradient(180deg, rgba(7,141,59,0.06), rgba(21,156,188,0.01));
+    color: var(--brand-2);
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+    .grid { gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .icon { width: 64px; height: 64px; font-size: 26px; border-radius: 12px; }
+    .card { padding: 16px; min-height: 82px; gap: 12px; }
+    .label { font-size: 15px; }
+    .desc { font-size: 12px; }
+}
