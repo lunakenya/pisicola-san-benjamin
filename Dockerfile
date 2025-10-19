@@ -11,7 +11,6 @@ WORKDIR /app
 
 # Copia SOLO los archivos de configuración de NPM y Node
 COPY package.json ./ 
-COPY .npmrc .nvmrc ./
 
 # Instala las dependencias de la aplicación usando npm
 RUN npm install
@@ -41,7 +40,7 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/public ./public
 
-# Configura variables de entorno
+# Configura variables de entorno 
 ENV NODE_ENV production
 ENV PORT 3000
 
