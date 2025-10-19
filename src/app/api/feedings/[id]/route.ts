@@ -1,4 +1,3 @@
-// src/app/api/feedings/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool, QueryResult } from 'pg';
 import { z } from 'zod';
