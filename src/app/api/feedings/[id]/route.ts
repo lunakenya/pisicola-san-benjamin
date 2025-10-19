@@ -83,7 +83,7 @@ function computeMes(fecha: string): number | null {
  */
 export async function GET(
     req: NextRequest, 
-    context: { params: RouteParams } // <-- Firma Directa Aceptada por Next.js
+    { params }: { params: { id: string } } // <-- ¡El cambio final!
 ) {
     // Usamos context.params.id directamente
     const id = parseId(context.params?.id);
