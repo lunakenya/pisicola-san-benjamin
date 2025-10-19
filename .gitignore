@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# Excluir archivos específicos de Docker
+Dockerfile
+.dockerignore
+
 # production
 /build
 
