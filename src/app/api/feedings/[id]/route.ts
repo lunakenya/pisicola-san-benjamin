@@ -76,7 +76,7 @@ function computeMes(fecha: string): number | null {
 /** GET single feeding */
 export async function GET(
     req: NextRequest, 
-    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
     context: any 
 ) {
     const params = context.params;
@@ -111,7 +111,7 @@ export async function GET(
 /** PUT (reemplazo completo) */
 export async function PUT(
     req: NextRequest, 
-    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
     context: any 
 ) {
     const params = context.params;
@@ -224,7 +224,7 @@ export async function PUT(
 /** PATCH (parcial) */
 export async function PATCH(
     req: NextRequest, 
-    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
     context: any 
 ) {
     const params = context.params;
@@ -330,7 +330,7 @@ export async function PATCH(
 /** DELETE (soft) */
 export async function DELETE(
     req: NextRequest, 
-    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
     context: any 
 ) {
     const params = context.params;
