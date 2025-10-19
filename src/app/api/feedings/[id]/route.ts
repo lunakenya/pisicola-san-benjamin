@@ -1,9 +1,16 @@
+// pisicola-san-benjamin/src/app/api/feedings/[id]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { z } from 'zod';
 import { requireAuthApi } from '@/lib/requireRole';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// Interfaz para el parámetro de ruta dinámico [id]
+interface RouteParams {
+  id: string; // El nombre 'id' debe coincidir con el nombre de la carpeta dinámica: [id]
+}
 
 const PutFeedingSchema = z.object({
     lote_id: z.number().int().nullable(),
@@ -73,13 +80,14 @@ function computeMes(fecha: string): number | null {
     return d.getMonth() + 1;
 }
 
-/** GET single feeding */
+/** * GET single feeding
+ * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+ */
 export async function GET(
     req: NextRequest, 
-    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
-    context: any 
+    { params }: { params: RouteParams } 
 ) {
-    const params = context.params;
+    // Ya no se necesita: const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -108,13 +116,14 @@ export async function GET(
     }
 }
 
-/** PUT (reemplazo completo) */
+/** * PUT (reemplazo completo)
+ * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+ */
 export async function PUT(
     req: NextRequest, 
-    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
-    context: any 
+    { params }: { params: RouteParams } 
 ) {
-    const params = context.params;
+    // Ya no se necesita: const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -221,13 +230,14 @@ export async function PUT(
     }
 }
 
-/** PATCH (parcial) */
+/** * PATCH (parcial)
+ * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+ */
 export async function PATCH(
     req: NextRequest, 
-    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
-    context: any 
+    { params }: { params: RouteParams } 
 ) {
-    const params = context.params;
+    // Ya no se necesita: const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -327,13 +337,14 @@ export async function PATCH(
     }
 }
 
-/** DELETE (soft) */
+/** * DELETE (soft)
+ * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+ */
 export async function DELETE(
     req: NextRequest, 
-    // CORRECCIÓN: Usamos 'any' para satisfacer el compilador de Next.js.
-    context: any 
+    { params }: { params: RouteParams } 
 ) {
-    const params = context.params;
+    // Ya no se necesita: const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
