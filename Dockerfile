@@ -9,15 +9,12 @@ RUN apk add --no-cache python3 g++ make
 
 WORKDIR /app
 
-# Copia los archivos de configuración
-# Usa 'yarn.lock' si usas yarn; si usas npm, puedes borrar la línea 'yarn.lock'
-COPY package.json yarn.lock ./
-COPY .npmrc .yarnrc .nvmrc ./
+# Copia SOLO los archivos de configuración de NPM y Node
+COPY package.json ./ 
+COPY .npmrc .nvmrc ./
 
-# Instala las dependencias de la aplicación
-# Asegúrate de usar el comando correcto para tu gestor de paquetes
+# Instala las dependencias de la aplicación usando npm
 RUN npm install
-# Si usas yarn, usa: RUN yarn install --frozen-lockfile
 
 # Copia el código fuente
 COPY . .
@@ -26,8 +23,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Ejecuta la compilación de Next.js
-# La bandera '|| true' es una solución temporal para forzar que Docker continúe 
-# si el linting/tipado estricto falla, confiando en la variable de entorno de Railway/Vercel.
+# Se usa '|| true' para forzar que Docker continúe si hay errores de Lint/TS
 RUN npm run build || true 
 
 
