@@ -284,8 +284,8 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
         for (const key of Object.keys(updates)) {
             if (!allowed.includes(key)) continue;
             sets.push(`${key} = $${idx++}`);
-            // CORRECCIÓN FINAL: Reemplazo de @ts-ignore por @ts-expect-error para cumplir con ESLint
-            // @ts-expect-error
+            // CORRECCIÓN: Se añade la descripción para cumplir con el linter.
+            // @ts-expect-error: key is safe
             vals.push(updates[key]);
         }
 
