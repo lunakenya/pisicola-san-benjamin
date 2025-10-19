@@ -1,4 +1,3 @@
-// src/app/api/feedings/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { z } from 'zod';
@@ -285,7 +284,8 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
         for (const key of Object.keys(updates)) {
             if (!allowed.includes(key)) continue;
             sets.push(`${key} = $${idx++}`);
-            // @ts-ignore
+            // CORRECCIÓN FINAL: Reemplazo de @ts-ignore por @ts-expect-error para cumplir con ESLint
+            // @ts-expect-error
             vals.push(updates[key]);
         }
 
