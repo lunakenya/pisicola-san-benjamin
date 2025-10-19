@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool, QueryResult } from 'pg';
+import { Pool } from 'pg';
 import { z } from 'zod';
 import { requireAuthApi } from '@/lib/requireRole';
 
@@ -77,6 +77,7 @@ function computeMes(fecha: string): number | null {
 }
 
 /** GET single feeding */
+// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function GET(
     req: NextRequest, 
     context: { params: { id: string } } // FIX: Definición de tipo en línea
@@ -111,6 +112,7 @@ export async function GET(
 }
 
 /** PUT (reemplazo completo) */
+// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function PUT(
     req: NextRequest, 
     context: { params: { id: string } } // FIX: Definición de tipo en línea
@@ -223,6 +225,7 @@ export async function PUT(
 }
 
 /** PATCH (parcial) */
+// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function PATCH(
     req: NextRequest, 
     context: { params: { id: string } } // FIX: Definición de tipo en línea
@@ -328,6 +331,7 @@ export async function PATCH(
 }
 
 /** DELETE (soft) */
+// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function DELETE(
     req: NextRequest, 
     context: { params: { id: string } } // FIX: Definición de tipo en línea
