@@ -22,12 +22,8 @@ const PutFeedingSchema = z.object({
 });
 const PatchFeedingSchema = PutFeedingSchema.partial();
 
-// FIX: Usamos una interfaz estándar para el contexto de la ruta dinámica en Next.js
-interface RouteContext {
-    params: {
-        id: string;
-    };
-}
+// Eliminamos la interfaz externa y usamos la definición en línea en las funciones.
+// interface RouteContext { params: { id: string }; }
 
 function parseId(param: string | string[] | undefined): number | null {
     const id = Number(param);
@@ -82,7 +78,10 @@ function computeMes(fecha: string): number | null {
 }
 
 /** GET single feeding */
-export async function GET(req: NextRequest, context: RouteContext) {
+export async function GET(
+    req: NextRequest, 
+    context: { params: { id: string } } // FIX: Definición de tipo en línea
+) {
     const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
@@ -113,7 +112,10 @@ export async function GET(req: NextRequest, context: RouteContext) {
 }
 
 /** PUT (reemplazo completo) */
-export async function PUT(req: NextRequest, context: RouteContext) {
+export async function PUT(
+    req: NextRequest, 
+    context: { params: { id: string } } // FIX: Definición de tipo en línea
+) {
     const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
@@ -222,7 +224,10 @@ export async function PUT(req: NextRequest, context: RouteContext) {
 }
 
 /** PATCH (parcial) */
-export async function PATCH(req: NextRequest, context: RouteContext) {
+export async function PATCH(
+    req: NextRequest, 
+    context: { params: { id: string } } // FIX: Definición de tipo en línea
+) {
     const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
@@ -324,7 +329,10 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 }
 
 /** DELETE (soft) */
-export async function DELETE(req: NextRequest, context: RouteContext) {
+export async function DELETE(
+    req: NextRequest, 
+    context: { params: { id: string } } // FIX: Definición de tipo en línea
+) {
     const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
