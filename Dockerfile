@@ -9,24 +9,23 @@ RUN apk add --no-cache python3 g++ make
 
 WORKDIR /app
 
-# Copia SOLO los archivos de configuración de NPM y Node
+# COPIA SÓLO EL ARCHIVO CRÍTICO (package.json)
 COPY package.json ./ 
 
 # Instala las dependencias de la aplicación usando npm
 RUN npm install
 
-# Copia el código fuente
+# Copia el código fuente (lo que queda)
 COPY . .
 
 # Deshabilita la telemetría de Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Ejecuta la compilación de Next.js
-# Se usa '|| true' para forzar la continuación si hay errores de Lint/TS
 RUN npm run build || true 
 
 
-# Stage 2: Create the final production image (más ligera y segura)
+# Stage 2: Create the final production image
 FROM node:20-alpine
 
 # Crea un usuario no-root para seguridad
