@@ -7,8 +7,6 @@ import { requireAuthApi } from '@/lib/requireRole';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-type RouteParams = { id: string };
-
 const PutFeedingSchema = z.object({
   lote_id: z.number().int().nullable(),
   piscina_id: z.number().int().nullable(),
@@ -23,6 +21,7 @@ const PutFeedingSchema = z.object({
   valor_unitario: z.number().min(0),
   active: z.boolean().optional(),
 });
+
 const PatchFeedingSchema = PutFeedingSchema.partial();
 
 function parseId(param: string | undefined): number | null {
@@ -74,7 +73,7 @@ function round2(v: number) { return Math.round(v * 100) / 100; }
 /* ------------------------------------------------------ */
 /* ---------------------- GET ---------------------------- */
 /* ------------------------------------------------------ */
-export async function GET(req: NextRequest, context: { params: RouteParams }) {
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
   const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -84,7 +83,8 @@ export async function GET(req: NextRequest, context: { params: RouteParams }) {
   const client = await pool.connect();
   try {
     const r = await client.query(
-      `SELECT a.*, l.nombre AS lote_nombre, p.nombre AS piscina_nombre, t.nombre AS tipo_alimento_nombre, pr.nombre AS proveedor_nombre
+      `SELECT a.*, l.nombre AS lote_nombre, p.nombre AS piscina_nombre, 
+              t.nombre AS tipo_alimento_nombre, pr.nombre AS proveedor_nombre
        FROM alimentos a
        LEFT JOIN lotes l ON l.id = a.lote_id
        LEFT JOIN piscinas p ON p.id = a.piscina_id
@@ -93,8 +93,10 @@ export async function GET(req: NextRequest, context: { params: RouteParams }) {
        WHERE a.id = $1`,
       [id]
     );
+
     if (r.rowCount === 0)
       return NextResponse.json({ success: false, msg: 'No encontrado' }, { status: 404 });
+
     return NextResponse.json({ success: true, data: r.rows[0] });
   } catch (e) {
     console.error('GET /api/feedings/:id error', e);
@@ -107,7 +109,7 @@ export async function GET(req: NextRequest, context: { params: RouteParams }) {
 /* ------------------------------------------------------ */
 /* ---------------------- PUT ---------------------------- */
 /* ------------------------------------------------------ */
-export async function PUT(req: NextRequest, context: { params: RouteParams }) {
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
   const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -184,7 +186,7 @@ export async function PUT(req: NextRequest, context: { params: RouteParams }) {
 /* ------------------------------------------------------ */
 /* ---------------------- PATCH -------------------------- */
 /* ------------------------------------------------------ */
-export async function PATCH(req: NextRequest, context: { params: RouteParams }) {
+export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
   const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -277,7 +279,7 @@ export async function PATCH(req: NextRequest, context: { params: RouteParams }) 
 /* ------------------------------------------------------ */
 /* ---------------------- DELETE ------------------------- */
 /* ------------------------------------------------------ */
-export async function DELETE(req: NextRequest, context: { params: RouteParams }) {
+export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
   const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
