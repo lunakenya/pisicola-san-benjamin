@@ -1,4 +1,3 @@
-// src/lib/requireRole.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, JWTPayload } from './jwt';
 
@@ -12,7 +11,7 @@ import { verifyToken, JWTPayload } from './jwt';
 export function extractTokenFromRequest(req: NextRequest | { headers?: Headers; cookies?: any }): string | null {
     try {
         // cookie (NextRequest has cookies.get(name)?.value)
-        // @ts-ignore - NextRequest cookies typing in different next versions can vary
+        // @ts-expect-error - NextRequest cookies typing in different next versions can vary
         const cookieVal = req.cookies?.get?.('auth_token')?.value;
         if (cookieVal) return cookieVal;
 
