@@ -1,4 +1,5 @@
 // src/app/api/feedings/[id]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { z } from 'zod';
@@ -6,9 +7,7 @@ import { requireAuthApi } from '@/lib/requireRole';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-interface RouteParams {
-  id: string;
-}
+type RouteParams = { id: string };
 
 const PutFeedingSchema = z.object({
   lote_id: z.number().int().nullable(),
@@ -26,9 +25,10 @@ const PutFeedingSchema = z.object({
 });
 const PatchFeedingSchema = PutFeedingSchema.partial();
 
-function parseId(param: string | string[] | undefined): number | null {
+function parseId(param: string | undefined): number | null {
   const id = Number(param);
-  return Number.isInteger(id) && id > 0 ? id : null;
+  if (!Number.isInteger(id) || id <= 0) return null;
+  return id;
 }
 
 async function operadorTienePaseRecienteEnTablaSolicitudes(
@@ -61,27 +61,21 @@ async function operadorTienePaseRecienteEnTablaSolicitudes(
         AND au.used_at >= NOW() - ($5 || ' minutes')::interval
       LIMIT 1
     `;
-    const r = await client.query(q, [
-      tablaNegocio,
-      registroId,
-      userId,
-      tablaSolicitudes,
-      String(dentroMin),
-    ]);
+    const r = await client.query(q, [tablaNegocio, registroId, userId, tablaSolicitudes, String(dentroMin)]);
     return r.rowCount > 0;
   } finally {
     client.release();
   }
 }
 
-const round3 = (v: number) => Math.round(v * 1000) / 1000;
-const round2 = (v: number) => Math.round(v * 100) / 100;
+function round3(v: number) { return Math.round(v * 1000) / 1000; }
+function round2(v: number) { return Math.round(v * 100) / 100; }
 
-/* ==========================================
-   GET /api/feedings/[id]
-========================================== */
+/* ------------------------------------------------------ */
+/* ---------------------- GET ---------------------------- */
+/* ------------------------------------------------------ */
 export async function GET(req: NextRequest, context: { params: RouteParams }) {
-  const id = parseId(context.params?.id);
+  const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
   const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
@@ -90,8 +84,7 @@ export async function GET(req: NextRequest, context: { params: RouteParams }) {
   const client = await pool.connect();
   try {
     const r = await client.query(
-      `SELECT a.*, l.nombre AS lote_nombre, p.nombre AS piscina_nombre, 
-              t.nombre AS tipo_alimento_nombre, pr.nombre AS proveedor_nombre
+      `SELECT a.*, l.nombre AS lote_nombre, p.nombre AS piscina_nombre, t.nombre AS tipo_alimento_nombre, pr.nombre AS proveedor_nombre
        FROM alimentos a
        LEFT JOIN lotes l ON l.id = a.lote_id
        LEFT JOIN piscinas p ON p.id = a.piscina_id
@@ -111,11 +104,11 @@ export async function GET(req: NextRequest, context: { params: RouteParams }) {
   }
 }
 
-/* ==========================================
-   PUT /api/feedings/[id]
-========================================== */
+/* ------------------------------------------------------ */
+/* ---------------------- PUT ---------------------------- */
+/* ------------------------------------------------------ */
 export async function PUT(req: NextRequest, context: { params: RouteParams }) {
-  const id = parseId(context.params?.id);
+  const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
   const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
@@ -126,19 +119,9 @@ export async function PUT(req: NextRequest, context: { params: RouteParams }) {
   const json = await req.json().catch(() => ({}));
   const parsed = PutFeedingSchema.safeParse(json);
   if (!parsed.success)
-    return NextResponse.json({ success: false, msg: parsed.error.issues?.[0]?.message || 'Datos inválidos' }, { status: 400 });
+    return NextResponse.json({ success: false, msg: parsed.error.issues[0]?.message || 'Datos inválidos' }, { status: 400 });
 
-  const {
-    lote_id,
-    piscina_id,
-    fecha,
-    tipo_alimento_id,
-    cantidad,
-    proveedor_id = null,
-    nro_factura = null,
-    valor_unitario,
-    active,
-  } = parsed.data;
+  const { lote_id, piscina_id, fecha, tipo_alimento_id, cantidad, proveedor_id = null, nro_factura = null, valor_unitario, active } = parsed.data;
 
   const valor_u = round3(Number(valor_unitario ?? 0));
   const total = round2((Number(cantidad) || 0) * valor_u);
@@ -163,45 +146,28 @@ export async function PUT(req: NextRequest, context: { params: RouteParams }) {
       );
       if (!ok) {
         await client.query('ROLLBACK');
-        return NextResponse.json(
-          {
-            success: false,
-            msg: incluyeActive
-              ? 'No autorizado: requiere código válido reciente de inactivación/restauración.'
-              : 'No autorizado: requiere código válido reciente de edición.',
-          },
-          { status: 403 }
-        );
+        return NextResponse.json({
+          success: false,
+          msg: incluyeActive
+            ? 'No autorizado: requiere código válido reciente de inactivación/restauración.'
+            : 'No autorizado: requiere código válido reciente de edición.',
+        }, { status: 403 });
       }
     }
 
-    const updSql = `
-      UPDATE alimentos
-      SET lote_id=$1, piscina_id=$2, fecha=$3, tipo_alimento_id=$4, cantidad=$5,
-          proveedor_id=$6, nro_factura=$7, valor_unitario=$8, total=$9,
-          editado_por=$10, editado_en=NOW(), active = COALESCE($11, active)
-      WHERE id=$12
-      RETURNING *
-    `;
-    const updRes = await client.query(updSql, [
-      lote_id,
-      piscina_id,
-      fecha,
-      tipo_alimento_id,
-      cantidad,
-      proveedor_id,
-      nro_factura,
-      valor_u,
-      total,
-      user.id,
-      active === undefined ? null : active,
-      id,
-    ]);
+    const updRes = await client.query(
+      `UPDATE alimentos
+       SET lote_id=$1, piscina_id=$2, fecha=$3, tipo_alimento_id=$4, cantidad=$5,
+           proveedor_id=$6, nro_factura=$7, valor_unitario=$8, total=$9,
+           editado_por=$10, editado_en=NOW(), active=COALESCE($11, active)
+       WHERE id=$12 RETURNING *`,
+      [lote_id, piscina_id, fecha, tipo_alimento_id, cantidad, proveedor_id, nro_factura, valor_u, total, user.id, active ?? null, id]
+    );
 
     await client.query(
       `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-       VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
-      [user.id, id, 'UPDATE', JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
+       VALUES ($1,'alimentos',$2,'UPDATE',$3::jsonb)`,
+      [user.id, id, JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
     );
 
     await client.query('COMMIT');
@@ -209,20 +175,17 @@ export async function PUT(req: NextRequest, context: { params: RouteParams }) {
   } catch (e) {
     await client.query('ROLLBACK');
     console.error('PUT /api/feedings/:id error', e);
-    const pgError = e as { code?: string };
-    if (pgError?.code === '23505')
-      return NextResponse.json({ success: false, msg: 'Conflicto en datos (duplicado)' }, { status: 409 });
     return NextResponse.json({ success: false, msg: 'Error interno al actualizar registro' }, { status: 500 });
   } finally {
     client.release();
   }
 }
 
-/* ==========================================
-   PATCH /api/feedings/[id]
-========================================== */
+/* ------------------------------------------------------ */
+/* ---------------------- PATCH -------------------------- */
+/* ------------------------------------------------------ */
 export async function PATCH(req: NextRequest, context: { params: RouteParams }) {
-  const id = parseId(context.params?.id);
+  const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
   const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
@@ -233,7 +196,8 @@ export async function PATCH(req: NextRequest, context: { params: RouteParams }) 
   const json = await req.json().catch(() => ({}));
   const parsed = PatchFeedingSchema.safeParse(json);
   if (!parsed.success)
-    return NextResponse.json({ success: false, msg: parsed.error.issues?.[0]?.message || 'Datos inválidos' }, { status: 400 });
+    return NextResponse.json({ success: false, msg: parsed.error.issues[0]?.message || 'Datos inválidos' }, { status: 400 });
+
   const updates = parsed.data;
   if (Object.keys(updates).length === 0)
     return NextResponse.json({ success: false, msg: 'No hay campos para actualizar' }, { status: 400 });
@@ -258,52 +222,36 @@ export async function PATCH(req: NextRequest, context: { params: RouteParams }) 
       );
       if (!ok) {
         await client.query('ROLLBACK');
-        return NextResponse.json(
-          {
-            success: false,
-            msg: incluyeActive
-              ? 'No autorizado: requiere código válido de inactivación/restauración.'
-              : 'No autorizado: requiere código válido de edición.',
-          },
-          { status: 403 }
-        );
+        return NextResponse.json({
+          success: false,
+          msg: incluyeActive
+            ? 'No autorizado: requiere código válido de inactivación/restauración.'
+            : 'No autorizado: requiere código válido de edición.',
+        }, { status: 403 });
       }
     }
 
     const before = beforeRes.rows[0];
-    const valorUnitarioNew =
-      updates.valor_unitario !== undefined
-        ? round3(Number(updates.valor_unitario ?? 0))
-        : before.valor_unitario;
-    const cantidadNew =
-      updates.cantidad !== undefined ? Number(updates.cantidad ?? 0) : before.cantidad;
+    const valorUnitarioNew = updates.valor_unitario !== undefined ? round3(Number(updates.valor_unitario ?? 0)) : before.valor_unitario;
+    const cantidadNew = updates.cantidad !== undefined ? Number(updates.cantidad ?? 0) : before.cantidad;
     const totalNew = round2((Number(cantidadNew) || 0) * (Number(valorUnitarioNew) || 0));
 
     const sets: string[] = [];
     const vals: any[] = [];
     let idx = 1;
-    const allowed = [
-      'lote_id',
-      'piscina_id',
-      'fecha',
-      'tipo_alimento_id',
-      'cantidad',
-      'proveedor_id',
-      'nro_factura',
-      'valor_unitario',
-      'active',
-    ];
+    const allowed = ['lote_id', 'piscina_id', 'fecha', 'tipo_alimento_id', 'cantidad', 'proveedor_id', 'nro_factura', 'valor_unitario', 'active'];
 
     for (const key of Object.keys(updates)) {
       if (!allowed.includes(key)) continue;
+      // @ts-ignore
       sets.push(`${key} = $${idx++}`);
-      // @ts-expect-error dynamic key
+      // @ts-ignore
       vals.push(updates[key]);
     }
 
     sets.push(`total = $${idx++}`); vals.push(totalNew);
     sets.push(`editado_por = $${idx++}`); vals.push(user.id);
-    sets.push(`editado_en = NOW()`);
+    sets.push(`editado_en = NOW()`); // timestamp directo
     vals.push(id);
 
     const sql = `UPDATE alimentos SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`;
@@ -311,8 +259,8 @@ export async function PATCH(req: NextRequest, context: { params: RouteParams }) 
 
     await client.query(
       `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-       VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
-      [user.id, id, 'UPDATE', JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
+       VALUES ($1,'alimentos',$2,'UPDATE',$3::jsonb)`,
+      [user.id, id, JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
     );
 
     await client.query('COMMIT');
@@ -326,11 +274,11 @@ export async function PATCH(req: NextRequest, context: { params: RouteParams }) 
   }
 }
 
-/* ==========================================
-   DELETE /api/feedings/[id]
-========================================== */
+/* ------------------------------------------------------ */
+/* ---------------------- DELETE ------------------------- */
+/* ------------------------------------------------------ */
 export async function DELETE(req: NextRequest, context: { params: RouteParams }) {
-  const id = parseId(context.params?.id);
+  const id = parseId(context.params.id);
   if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
   const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
@@ -368,8 +316,8 @@ export async function DELETE(req: NextRequest, context: { params: RouteParams })
 
     await client.query(
       `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-       VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
-      [user.id, id, 'DELETE', JSON.stringify({ old: beforeRes.rows[0], soft_delete: true })]
+       VALUES ($1,'alimentos',$2,'DELETE',$3::jsonb)`,
+      [user.id, id, JSON.stringify({ old: beforeRes.rows[0], soft_delete: true })]
     );
 
     await client.query('COMMIT');
