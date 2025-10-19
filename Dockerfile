@@ -9,13 +9,17 @@ RUN apk add --no-cache python3 g++ make
 
 WORKDIR /app
 
-# COPIA SÓLO EL ARCHIVO CRÍTICO (package.json)
+# Línea 1: Copia el archivo CRÍTICO (package.json). Si no está, debe fallar.
 COPY package.json ./ 
+
+# Línea 2: Copia archivos opcionales. El '|| true' permite que continúe si no se encuentran.
+# Esto es la corrección final para tu error:
+COPY .npmrc .nvmrc ./ || true 
 
 # Instala las dependencias de la aplicación usando npm
 RUN npm install
 
-# Copia el código fuente (lo que queda)
+# Copia el código fuente
 COPY . .
 
 # Deshabilita la telemetría de Next.js
