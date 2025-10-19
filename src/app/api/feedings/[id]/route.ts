@@ -1,6 +1,6 @@
 // src/app/api/feedings/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool, QueryResult } from 'pg'; // Agregamos QueryResult para tipado
+import { Pool, QueryResult } from 'pg';
 import { z } from 'zod';
 import { requireAuthApi } from '@/lib/requireRole';
 
@@ -22,19 +22,18 @@ const PutFeedingSchema = z.object({
 });
 const PatchFeedingSchema = PutFeedingSchema.partial();
 
-// Corrección 1: Tipamos el parámetro de entrada y el retorno
+// FIX: Usamos una interfaz estándar para el contexto de la ruta dinámica en Next.js
+interface RouteContext {
+    params: {
+        id: string;
+    };
+}
+
 function parseId(param: string | string[] | undefined): number | null {
     const id = Number(param);
     if (!Number.isInteger(id) || id <= 0) return null;
     return id;
 }
-
-// Corrección 2: Tipamos 'context' correctamente para Next.js App Router
-type Context = {
-    params: {
-        id: string;
-    };
-};
 
 async function operadorTienePaseRecienteEnTablaSolicitudes(
     userId: number,
@@ -83,9 +82,8 @@ function computeMes(fecha: string): number | null {
 }
 
 /** GET single feeding */
-// Corrección 3: Usamos el tipo 'Context' en lugar de 'any'
-export async function GET(req: NextRequest, context: Context) {
-    const params = context.params; // Acceso directo al parámetro
+export async function GET(req: NextRequest, context: RouteContext) {
+    const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -106,7 +104,7 @@ export async function GET(req: NextRequest, context: Context) {
         );
         if (r.rowCount === 0) return NextResponse.json({ success: false, msg: 'No encontrado' }, { status: 404 });
         return NextResponse.json({ success: true, data: r.rows[0] });
-    } catch (e: unknown) { // Corrección 4: Usamos 'unknown' en el catch
+    } catch (e: unknown) {
         console.error('GET /api/feedings/:id error', e);
         return NextResponse.json({ success: false, msg: 'Error interno al obtener registro' }, { status: 500 });
     } finally {
@@ -115,16 +113,16 @@ export async function GET(req: NextRequest, context: Context) {
 }
 
 /** PUT (reemplazo completo) */
-export async function PUT(req: NextRequest, context: Context) { // Corrección 5: Usamos el tipo 'Context'
+export async function PUT(req: NextRequest, context: RouteContext) {
     const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-    
-    // Corrección 6: Tipado más seguro para el usuario. Asumimos que 'auth' devuelve un objeto con un 'role' y 'id'.
-    const user = auth as { id: number; role: string; }; 
+
+    // Tipado más seguro para el usuario. Asumimos que 'auth' devuelve un objeto con 'id' y 'role'.
+    const user = auth as { id: number; role: string; };
     const role = (user.role ?? '').toString().toUpperCase();
 
     const json = await req.json().catch(() => ({}));
@@ -205,13 +203,13 @@ export async function PUT(req: NextRequest, context: Context) { // Corrección 5
 
         await client.query(
             `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-        VALUES ($1,'alimentos',$2,$3,$4::jsonb)`,
+        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
             [user.id, id, 'UPDATE', JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
         );
 
         await client.query('COMMIT');
         return NextResponse.json({ success: true, data: updRes.rows[0] });
-    } catch (e: unknown) { // Corrección 7: Usamos 'unknown' en lugar de 'e: any'
+    } catch (e: unknown) {
         await client.query('ROLLBACK');
         console.error('PUT /api/feedings/:id error', e);
         // Si el error tiene código PostgreSQL
@@ -224,14 +222,14 @@ export async function PUT(req: NextRequest, context: Context) { // Corrección 5
 }
 
 /** PATCH (parcial) */
-export async function PATCH(req: NextRequest, context: Context) { // Corrección 8: Usamos el tipo 'Context'
+export async function PATCH(req: NextRequest, context: RouteContext) {
     const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-    // Corrección 9: Tipado más seguro para el usuario
+    // Tipado más seguro para el usuario
     const user = auth as { id: number; role: string; };
     const role = (user.role ?? '').toString().toUpperCase();
 
@@ -278,21 +276,22 @@ export async function PATCH(req: NextRequest, context: Context) { // Corrección
 
         // Recalcular campos dependientes
         const before = beforeRes.rows[0];
-        const valorUnitarioNew = (updates as any).valor_unitario !== undefined ? round3(Number((updates as any).valor_unitario ?? 0)) : before.valor_unitario;
-        const cantidadNew = (updates as any).cantidad !== undefined ? Number((updates as any).cantidad ?? 0) : before.cantidad;
+        // Usamos el índice de Updates si existe, sino el valor anterior
+        const valorUnitarioNew = updates.valor_unitario !== undefined ? round3(Number(updates.valor_unitario ?? 0)) : before.valor_unitario;
+        const cantidadNew = updates.cantidad !== undefined ? Number(updates.cantidad ?? 0) : before.cantidad;
         const totalNew = round2((Number(cantidadNew) || 0) * (Number(valorUnitarioNew) || 0));
 
         // Build SETs
         const sets: string[] = [];
-        const vals: any[] = []; // Corrección 10: Tipado de vals (array de 'any')
+        const vals: any[] = [];
         let idx = 1;
         const allowed = ['lote_id','piscina_id','fecha','tipo_alimento_id','cantidad','proveedor_id','nro_factura','valor_unitario','active'];
-        
-        // Corrección 11: Iteración segura sobre las claves y uso de @ts-expect-error
+
+        // Iteración segura sobre las claves
         for (const key of Object.keys(updates)) {
             if (!allowed.includes(key)) continue;
             sets.push(`${key} = $${idx++}`);
-            
+            // @ts-expect-error key is guaranteed to be in updates and allowed
             vals.push(updates[key]);
         }
 
@@ -309,13 +308,13 @@ export async function PATCH(req: NextRequest, context: Context) { // Corrección
 
         await client.query(
             `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`, // Corrección 12: Aseguramos el tipo 'text' para 'accion'
+        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
             [user.id, id, 'UPDATE', JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
         );
 
         await client.query('COMMIT');
         return NextResponse.json({ success: true, data: updRes.rows[0] });
-    } catch (e: unknown) { // Corrección 13: Usamos 'unknown'
+    } catch (e: unknown) {
         await client.query('ROLLBACK');
         console.error('PATCH /api/feedings/:id error', e);
         return NextResponse.json({ success: false, msg: 'Error interno al actualizar registro' }, { status: 500 });
@@ -325,15 +324,15 @@ export async function PATCH(req: NextRequest, context: Context) { // Corrección
 }
 
 /** DELETE (soft) */
-export async function DELETE(req: NextRequest, context: Context) { // Corrección 14: Usamos el tipo 'Context'
+export async function DELETE(req: NextRequest, context: RouteContext) {
     const params = context.params;
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-    // Corrección 15: Tipado más seguro para el usuario
-    const user = auth as { id: number; role: string; }; 
+    // Tipado más seguro para el usuario
+    const user = auth as { id: number; role: string; };
     const role = (user.role ?? '').toString().toUpperCase();
 
     const client = await pool.connect();
@@ -367,13 +366,13 @@ export async function DELETE(req: NextRequest, context: Context) { // Correcció
 
         await client.query(
             `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`, // Corrección 16: Aseguramos el tipo 'text' para 'accion'
+        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
             [user.id, id, 'DELETE', JSON.stringify({ old: beforeRes.rows[0], soft_delete: true })]
         );
 
         await client.query('COMMIT');
         return NextResponse.json({ success: true });
-    } catch (e: unknown) { // Corrección 17: Usamos 'unknown'
+    } catch (e: unknown) {
         await client.query('ROLLBACK');
         console.error('DELETE /api/feedings/:id error', e);
         return NextResponse.json({ success: false, msg: 'Error interno al eliminar registro' }, { status: 500 });
