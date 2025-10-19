@@ -21,9 +21,6 @@ const PutFeedingSchema = z.object({
 });
 const PatchFeedingSchema = PutFeedingSchema.partial();
 
-// Eliminamos la interfaz externa y usamos la definición en línea en las funciones.
-// interface RouteContext { params: { id: string }; }
-
 function parseId(param: string | string[] | undefined): number | null {
     const id = Number(param);
     if (!Number.isInteger(id) || id <= 0) return null;
@@ -77,11 +74,10 @@ function computeMes(fecha: string): number | null {
 }
 
 /** GET single feeding */
-// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function GET(
     req: NextRequest, 
-    context: { params: any }
-) { /* ... */ } } // FIX: Definición de tipo en línea
+    // FIX: Se mantiene el tipado y se elimina la llave de cierre extra.
+    context: { params: { id: string } } 
 ) {
     const params = context.params;
     const id = parseId(params?.id);
@@ -113,10 +109,10 @@ export async function GET(
 }
 
 /** PUT (reemplazo completo) */
-// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function PUT(
     req: NextRequest, 
-    context: { params: { id: string } } // FIX: Definición de tipo en línea
+    // FIX: Se mantiene el tipado y se elimina la llave de cierre extra.
+    context: { params: { id: string } } 
 ) {
     const params = context.params;
     const id = parseId(params?.id);
@@ -226,10 +222,10 @@ export async function PUT(
 }
 
 /** PATCH (parcial) */
-// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function PATCH(
     req: NextRequest, 
-    context: { params: { id: string } } // FIX: Definición de tipo en línea
+    // FIX: Se mantiene el tipado y se elimina la llave de cierre extra.
+    context: { params: { id: string } } 
 ) {
     const params = context.params;
     const id = parseId(params?.id);
@@ -332,10 +328,10 @@ export async function PATCH(
 }
 
 /** DELETE (soft) */
-// **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function DELETE(
     req: NextRequest, 
-    context: { params: { id: string } } // FIX: Definición de tipo en línea
+    // FIX: Se mantiene el tipado y se elimina la llave de cierre extra.
+    context: { params: { id: string } } 
 ) {
     const params = context.params;
     const id = parseId(params?.id);
