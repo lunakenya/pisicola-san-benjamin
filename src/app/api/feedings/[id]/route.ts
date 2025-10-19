@@ -1,5 +1,3 @@
-// pisicola-san-benjamin/src/app/api/feedings/[id]/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { z } from 'zod';
@@ -81,14 +79,14 @@ function computeMes(fecha: string): number | null {
 }
 
 /** * GET single feeding
- * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+ * CORRECCIÓN CLAVE: El tipado del segundo argumento ahora es Next.js "nativo" (sin interfaz personalizada)
  */
 export async function GET(
     req: NextRequest, 
-    { params }: { params: RouteParams } 
+    context: { params: RouteParams } // <-- Firma Directa Aceptada por Next.js
 ) {
-    // Ya no se necesita: const params = context.params;
-    const id = parseId(params?.id);
+    // Usamos context.params.id directamente
+    const id = parseId(context.params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
@@ -117,14 +115,13 @@ export async function GET(
 }
 
 /** * PUT (reemplazo completo)
- * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+ * CORRECCIÓN CLAVE: El tipado del segundo argumento ahora es Next.js "nativo"
  */
 export async function PUT(
     req: NextRequest, 
-    { params }: { params: RouteParams } 
+    context: { params: RouteParams } 
 ) {
-    // Ya no se necesita: const params = context.params;
-    const id = parseId(params?.id);
+    const id = parseId(context.params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
@@ -231,14 +228,13 @@ export async function PUT(
 }
 
 /** * PATCH (parcial)
- * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+ * CORRECCIÓN CLAVE: El tipado del segundo argumento ahora es Next.js "nativo"
  */
 export async function PATCH(
     req: NextRequest, 
-    { params }: { params: RouteParams } 
+    context: { params: RouteParams } 
 ) {
-    // Ya no se necesita: const params = context.params;
-    const id = parseId(params?.id);
+    const id = parseId(context.params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
@@ -337,15 +333,14 @@ export async function PATCH(
     }
 }
 
-/** * DELETE (soft)
- * CORRECCIÓN: Se usa la firma oficial de Next.js: { params }: { params: RouteParams }
+/** * DELETE (soft) 
+ * CORRECCIÓN CLAVE: El tipado del segundo argumento ahora es Next.js "nativo"
  */
 export async function DELETE(
     req: NextRequest, 
-    { params }: { params: RouteParams } 
+    context: { params: RouteParams } 
 ) {
-    // Ya no se necesita: const params = context.params;
-    const id = parseId(params?.id);
+    const id = parseId(context.params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
