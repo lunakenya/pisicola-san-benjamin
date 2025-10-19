@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 # CORRECCIÓN DE VULNERABILIDADES: Actualiza los paquetes del sistema base
 RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
 
-# Instala dependencias para la compilación (Python y g++ si son necesarios)
+# Instala dependencias para la compilación
 RUN apk add --no-cache python3 g++ make
 
 WORKDIR /app
@@ -23,7 +23,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Ejecuta la compilación de Next.js
-# Se usa '|| true' para forzar que Docker continúe si hay errores de Lint/TS
+# Se usa '|| true' para forzar la continuación si hay errores de Lint/TS
 RUN npm run build || true 
 
 
