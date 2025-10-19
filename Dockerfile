@@ -14,14 +14,15 @@ COPY package.json ./
 # Instala las dependencias de la aplicación usando npm
 RUN npm install
 
-# Copia el código fuente (incluyendo el archivo route.ts corregido)
+# Copia el código fuente (incluyendo el archivo route.ts corregido y next.config.ts)
 COPY . .
 
 # Deshabilita la telemetría de Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Ejecuta la compilación de Next.js
-RUN npm run build || true
+# CORRECCIÓN: Eliminamos '|| true'. La compilación debe ser exitosa para que el paso continúe.
+RUN npm run build
 
 # ----------------------------------------------------------------------
 # Stage 2: Create the final production image (Usando Alpine)
@@ -33,6 +34,7 @@ RUN adduser --system --uid 1001 nextjs
 WORKDIR /home/nextjs
 
 # Copia el resultado de la compilación 'standalone'
+# Ahora esta línea debería funcionar ya que 'output: standalone' está configurado.
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next/standalone ./
