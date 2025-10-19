@@ -1,5 +1,5 @@
 # Stage 1: Build the Next.js application
-FROM node:20-alpine AS builder
+FROM node:18 AS builder
 
 # CORRECCIÓN DE VULNERABILIDADES: Actualiza los paquetes del sistema base
 RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
@@ -26,7 +26,7 @@ RUN npm run build || true
 
 
 # Stage 2: Create the final production image
-FROM node:20-alpine
+FROM node:18
 
 # Crea un usuario no-root para seguridad
 RUN addgroup --system --gid 1001 nodejs
