@@ -1,52 +1,66 @@
-# Stage 1: Build the Next.js application
-FROM node:18 AS builder
+# ----------------------------------------------------------------------
+# Stage 1: Build the Next.js application (Usando Alpine para ligereza)
+# ----------------------------------------------------------------------
+FROM node:18-alpine AS builder
 
-# CORRECCIÓN DE VULNERABILIDADES: Actualiza los paquetes del sistema base
-RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
+# Instala dependencias del sistema necesarias para compilar librerías nativas.
+# Esto reemplaza tu RUN apk add anterior.
+RUN apk update && \
+    apk add --no-cache python3 g++ make git openssl
 
-# Instala dependencias para la compilación
-RUN apk add --no-cache python3 g++ make
-
+# Crea el directorio de trabajo
 WORKDIR /app
 
-# Copia SOLO el archivo CRÍTICO (package.json)
-COPY package.json ./ 
+# Copia SOLO los archivos de configuración de dependencias para aprovechar el cache
+COPY package.json ./
+COPY package-lock.json ./
 
-# Instala las dependencias de la aplicación usando npm
-RUN npm install
+# Instala las dependencias. Usamos --unsafe-perm para evitar
+# problemas de permisos durante la instalación de paquetes nativos.
+RUN npm install --unsafe-perm
 
-# Copia el código fuente
+# Copia el código fuente restante de la aplicación
 COPY . .
 
 # Deshabilita la telemetría de Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Ejecuta la compilación de Next.js
-RUN npm run build || true 
+# Esto genera el resultado optimizado en el directorio .next/standalone
+RUN npm run build
 
 
-# Stage 2: Create the final production image
-FROM node:18
+# ----------------------------------------------------------------------
+# Stage 2: Create the final production image (También en Alpine)
+# ----------------------------------------------------------------------
+FROM node:18-alpine
 
-# Crea un usuario no-root para seguridad
+# Configuración de seguridad: Crea un usuario no-root
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# adduser -D es el comando para crear usuarios ligeros en Alpine
+RUN adduser -D --system --uid 1001 nextjs
+
 WORKDIR /home/nextjs
 
-# Copia el resultado de la compilación 'standalone'
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/public ./public
+# Copia los archivos de la etapa 'builder'
+# Se utiliza --chown para asegurar que el nuevo usuario 'nextjs' sea el propietario
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# Copia la salida del modo standalone
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+# Copia los assets estáticos
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Copia los archivos estáticos generados
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Configura variables de entorno 
+# Configura variables de entorno
 ENV NODE_ENV production
 ENV PORT 3000
 
 # El servidor de Next.js se ejecutará como el usuario 'nextjs'
 USER nextjs
 
-# Expone el puerto
+# Expone el puerto por el que escucha la aplicación
 EXPOSE 3000
 
 # Comando para iniciar la aplicación
