@@ -80,7 +80,8 @@ function computeMes(fecha: string): number | null {
 // **CORRECCIÓN AQUÍ:** Se elimina el tipado explícito del segundo argumento.
 export async function GET(
     req: NextRequest, 
-    context: { params: { id: string } } // FIX: Definición de tipo en línea
+    context: { params: any }
+) { /* ... */ } } // FIX: Definición de tipo en línea
 ) {
     const params = context.params;
     const id = parseId(params?.id);
