@@ -23,14 +23,14 @@ const PatchLossSchema = PutLossSchema.partial();
 
 /** ========= Helpers ========= **/
 
-// Corrección 1: Tipado del parámetro y del retorno
+// Tipado del parámetro y del retorno
 function parseId(param: string | string[] | undefined): number | null {
     const id = Number(param);
     if (!Number.isInteger(id) || id <= 0) return null;
     return id;
 }
 
-// Corrección 2: Definición del tipo Context para Next.js App Router
+// DEFINICIÓN CORRECTA DEL TIPO CONTEXT para Next.js App Router
 type Context = {
     params: {
         id: string;
@@ -78,9 +78,7 @@ async function operadorTienePaseRecienteEnTablaSolicitudes(
 }
 
 /** ========= GET ========= **/
-// Corrección 3: Usamos el tipo Context
-export async function GET(req: NextRequest, context: Context) {
-    const params = context.params;
+export async function GET(req: NextRequest, { params }: Context) { // CORRECTO: Destructurar params
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
@@ -99,7 +97,7 @@ export async function GET(req: NextRequest, context: Context) {
         );
         if (r.rowCount === 0) return NextResponse.json({ success: false, msg: 'No encontrado' }, { status: 404 });
         return NextResponse.json({ success: true, data: r.rows[0] });
-    } catch (e: unknown) { // Corrección 4: Tipado de catch
+    } catch (e: unknown) {
         console.error('GET /api/losses/:id error', e);
         return NextResponse.json({ success: false, msg: 'Error interno al obtener registro' }, { status: 500 });
     } finally {
@@ -108,15 +106,13 @@ export async function GET(req: NextRequest, context: Context) {
 }
 
 /** ========= PUT (reemplazo completo) ========= **/
-// Corrección 5: Tipado de context
-export async function PUT(req: NextRequest, context: Context) {
-    const params = context.params;
+export async function PUT(req: NextRequest, { params }: Context) { // CORRECTO: Destructurar params
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-    // Corrección 6: Tipado más seguro para el usuario
+    // Tipado más seguro para el usuario
     const user = auth as { id: number; role: string; };
     const role = (user.role ?? '').toString().toUpperCase();
 
@@ -190,7 +186,7 @@ export async function PUT(req: NextRequest, context: Context) {
 
         await client.query('COMMIT');
         return NextResponse.json({ success: true, data: updRes.rows[0] });
-    } catch (e: unknown) { // Corrección 7: Tipado de catch
+    } catch (e: unknown) {
         await client.query('ROLLBACK');
         console.error('PUT /api/losses/:id error', e);
         const pgError = e as { code?: string };
@@ -204,15 +200,13 @@ export async function PUT(req: NextRequest, context: Context) {
 }
 
 /** ========= PATCH (parcial) ========= **/
-// Corrección 8: Tipado de context
-export async function PATCH(req: NextRequest, context: Context) {
-    const params = context.params;
+export async function PATCH(req: NextRequest, { params }: Context) { // CORRECTO: Destructurar params
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-    // Corrección 9: Tipado más seguro para el usuario
+    // Tipado más seguro para el usuario
     const user = auth as { id: number; role: string; };
     const role = (user.role ?? '').toString().toUpperCase();
 
@@ -267,10 +261,9 @@ export async function PATCH(req: NextRequest, context: Context) {
         for (const key of Object.keys(updates)) {
             if (!['lote_id', 'piscina_id', 'fecha', 'muertos', 'faltantes', 'sobrantes', 'deformes', 'active'].includes(key)) continue;
             sets.push(`${key} = $${idx++}`);
-            
-            // Corrección 10: Usamos la directiva moderna. Si ya fue eliminada, el linter local no se quejará.
-            
-            vals.push(updates[key]);
+            // Ya que el usuario removió la directiva @ts-ignore, se asume que
+            // el linter local no se queja si se usa un keyof 'updates' que es Partial.
+            vals.push(updates[key as keyof typeof updates]);
         }
         sets.push(`editado_por = $${idx++}`);
         vals.push(user.id);
@@ -288,7 +281,7 @@ export async function PATCH(req: NextRequest, context: Context) {
 
         await client.query('COMMIT');
         return NextResponse.json({ success: true, data: updRes.rows[0] });
-    } catch (e: unknown) { // Corrección 11: Tipado de catch
+    } catch (e: unknown) {
         await client.query('ROLLBACK');
         console.error('PATCH /api/losses/:id error', e);
         return NextResponse.json({ success: false, msg: 'Error interno al actualizar registro' }, { status: 500 });
@@ -298,16 +291,14 @@ export async function PATCH(req: NextRequest, context: Context) {
 }
 
 /** ========= DELETE (soft delete) ========= **/
-// Corrección 12: Tipado de context
-export async function DELETE(req: NextRequest, context: Context) {
-    const params = context.params;
+export async function DELETE(req: NextRequest, { params }: Context) { // CORRECTO: Destructurar params
     const id = parseId(params?.id);
     if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
     // IMPORTANTE: también permitimos OPERADOR aquí.
     const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-    // Corrección 13: Tipado más seguro para el usuario
+    // Tipado más seguro para el usuario
     const user = auth as { id: number; role: string; };
     const role = (user.role ?? '').toString().toUpperCase();
 
@@ -354,7 +345,7 @@ export async function DELETE(req: NextRequest, context: Context) {
 
         await client.query('COMMIT');
         return NextResponse.json({ success: true });
-    } catch (e: unknown) { // Corrección 14: Tipado de catch
+    } catch (e: unknown) {
         await client.query('ROLLBACK');
         console.error('DELETE /api/losses/:id error', e);
         return NextResponse.json({ success: false, msg: 'Error interno al eliminar registro' }, { status: 500 });
