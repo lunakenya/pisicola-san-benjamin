@@ -1,5 +1,4 @@
-// src/app/api/feedings/[id]/route.ts
-import { NextResponse, type NextRequest, type RouteHandlerContext } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { z } from 'zod';
 import { requireAuthApi } from '@/lib/requireRole';
@@ -11,8 +10,8 @@ const PutFeedingSchema = z.object({
     piscina_id: z.number().int().nullable(),
     fecha: z
         .string()
-        .min(1, 'La fecha es requerida (formato YYYY‑MM‑DD)')
-        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha inválido (YYYY‑MM‑DD)'),
+        .min(1, 'La fecha es requerida (formato YYYY-MM-DD)')
+        .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha inválido (YYYY-MM-DD)'),
     tipo_alimento_id: z.number().int().nullable(),
     cantidad: z.number().min(0),
     proveedor_id: z.number().int().nullable().optional(),
@@ -58,25 +57,15 @@ async function operadorTienePaseRecienteEnTablaSolicitudes(
           AND au.used_at >= NOW() - ($5 || ' minutes')::interval
         LIMIT 1
         `;
-        const r = await client.query(q, [
-            tablaNegocio,
-            registroId,
-            userId,
-            tablaSolicitudes,
-            String(dentroMin),
-        ]);
+        const r = await client.query(q, [tablaNegocio, registroId, userId, tablaSolicitudes, String(dentroMin)]);
         return r.rowCount > 0;
     } finally {
         client.release();
     }
 }
 
-function round3(v: number) {
-    return Math.round(v * 1000) / 1000;
-}
-function round2(v: number) {
-    return Math.round(v * 100) / 100;
-}
+function round3(v: number) { return Math.round(v * 1000) / 1000; }
+function round2(v: number) { return Math.round(v * 100) / 100; }
 
 function computeMes(fecha: string): number | null {
     const d = new Date(`${fecha}T12:00:00Z`);
@@ -85,31 +74,31 @@ function computeMes(fecha: string): number | null {
 }
 
 /** GET single feeding */
-export async function GET(req: NextRequest, context: RouteHandlerContext) {
-    const id = parseId(context.params.id);
-    if (!id) {
-        return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
-    }
+export async function GET(
+    req: NextRequest, 
+    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    context: any 
+) {
+    const params = context.params;
+    const id = parseId(params?.id);
+    if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
-    const auth = await requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
+    const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
 
     const client = await pool.connect();
     try {
         const r = await client.query(
-            `SELECT a.*, l.nombre AS lote_nombre, p.nombre AS piscina_nombre,
-                    t.nombre AS tipo_alimento_nombre, pr.nombre AS proveedor_nombre
-             FROM alimentos a
-               LEFT JOIN lotes l ON l.id = a.lote_id
-               LEFT JOIN piscinas p ON p.id = a.piscina_id
-               LEFT JOIN tipos_alimento t ON t.id = a.tipo_alimento_id
-               LEFT JOIN proveedores pr ON pr.id = a.proveedor_id
-             WHERE a.id = $1`,
+            `SELECT a.*, l.nombre AS lote_nombre, p.nombre AS piscina_nombre, t.nombre AS tipo_alimento_nombre, pr.nombre AS proveedor_nombre
+        FROM alimentos a
+          LEFT JOIN lotes l ON l.id = a.lote_id
+          LEFT JOIN piscinas p ON p.id = a.piscina_id
+          LEFT JOIN tipos_alimento t ON t.id = a.tipo_alimento_id
+          LEFT JOIN proveedores pr ON pr.id = a.proveedor_id
+        WHERE a.id = $1`,
             [id]
         );
-        if (r.rowCount === 0) {
-            return NextResponse.json({ success: false, msg: 'No encontrado' }, { status: 404 });
-        }
+        if (r.rowCount === 0) return NextResponse.json({ success: false, msg: 'No encontrado' }, { status: 404 });
         return NextResponse.json({ success: true, data: r.rows[0] });
     } catch (e: unknown) {
         console.error('GET /api/feedings/:id error', e);
@@ -120,17 +109,21 @@ export async function GET(req: NextRequest, context: RouteHandlerContext) {
 }
 
 /** PUT (reemplazo completo) */
-export async function PUT(req: NextRequest, context: RouteHandlerContext) {
-    const id = parseId(context.params.id);
-    if (!id) {
-        return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
-    }
+export async function PUT(
+    req: NextRequest, 
+    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    context: any 
+) {
+    const params = context.params;
+    const id = parseId(params?.id);
+    if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
-    const auth = await requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
+    const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
 
-    const user = auth as { id: number; role: string };
-    const role = (user.role ?? '').toUpperCase();
+    // Tipado más seguro para el usuario. Asumimos que 'auth' devuelve un objeto con 'id' y 'role'.
+    const user = auth as { id: number; role: string; };
+    const role = (user.role ?? '').toString().toUpperCase();
 
     const json = await req.json().catch(() => ({}));
     const parsed = PutFeedingSchema.safeParse(json);
@@ -190,7 +183,8 @@ export async function PUT(req: NextRequest, context: RouteHandlerContext) {
             proveedor_id=$6, nro_factura=$7, valor_unitario=$8, total=$9,
             editado_por=$10, editado_en=NOW(), active = COALESCE($11, active)
         WHERE id=$12
-        RETURNING *`;
+        RETURNING *
+        `;
         const updVals = [
             lote_id,
             piscina_id,
@@ -199,7 +193,7 @@ export async function PUT(req: NextRequest, context: RouteHandlerContext) {
             cantidad,
             proveedor_id,
             nro_factura,
-            Number(valor_u.toFixed(3)),
+            Number(Number(valor_u).toFixed(3)),
             total,
             user.id,
             active === undefined ? null : active,
@@ -209,8 +203,8 @@ export async function PUT(req: NextRequest, context: RouteHandlerContext) {
 
         await client.query(
             `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-             VALUES ($1,'alimentos',$2,'UPDATE', $3::jsonb)`,
-            [user.id, id, JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
+        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
+            [user.id, id, 'UPDATE', JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
         );
 
         await client.query('COMMIT');
@@ -218,10 +212,9 @@ export async function PUT(req: NextRequest, context: RouteHandlerContext) {
     } catch (e: unknown) {
         await client.query('ROLLBACK');
         console.error('PUT /api/feedings/:id error', e);
-        const err = e as { code?: string };
-        if (err?.code === '23505') {
-            return NextResponse.json({ success: false, msg: 'Conflicto en datos (duplicado)' }, { status: 409 });
-        }
+        // Si el error tiene código PostgreSQL
+        const pgError = e as { code?: string };
+        if (pgError?.code === '23505') return NextResponse.json({ success: false, msg: 'Conflicto en datos (duplicado)' }, { status: 409 });
         return NextResponse.json({ success: false, msg: 'Error interno al actualizar registro' }, { status: 500 });
     } finally {
         client.release();
@@ -229,17 +222,20 @@ export async function PUT(req: NextRequest, context: RouteHandlerContext) {
 }
 
 /** PATCH (parcial) */
-export async function PATCH(req: NextRequest, context: RouteHandlerContext) {
-    const id = parseId(context.params.id);
-    if (!id) {
-        return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
-    }
+export async function PATCH(
+    req: NextRequest, 
+    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    context: any 
+) {
+    const params = context.params;
+    const id = parseId(params?.id);
+    if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
-    const auth = await requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
+    const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-
-    const user = auth as { id: number; role: string };
-    const role = user.role.toUpperCase();
+    // Tipado más seguro para el usuario
+    const user = auth as { id: number; role: string; };
+    const role = (user.role ?? '').toString().toUpperCase();
 
     const json = await req.json().catch(() => ({}));
     const parsed = PatchFeedingSchema.safeParse(json);
@@ -247,7 +243,6 @@ export async function PATCH(req: NextRequest, context: RouteHandlerContext) {
         const msg = parsed.error.issues?.[0]?.message || 'Datos inválidos';
         return NextResponse.json({ success: false, msg }, { status: 400 });
     }
-
     const updates = parsed.data;
     if (Object.keys(updates).length === 0) {
         return NextResponse.json({ success: false, msg: 'No hay campos para actualizar' }, { status: 400 });
@@ -283,42 +278,33 @@ export async function PATCH(req: NextRequest, context: RouteHandlerContext) {
             }
         }
 
+        // Recalcular campos dependientes
         const before = beforeRes.rows[0];
-        const valorUnitarioNew =
-            updates.valor_unitario !== undefined
-                ? round3(Number(updates.valor_unitario ?? 0))
-                : before.valor_unitario;
-        const cantidadNew =
-            updates.cantidad !== undefined
-                ? Number(updates.cantidad ?? 0)
-                : before.cantidad;
-        const totalNew = round2((cantidadNew || 0) * (valorUnitarioNew || 0));
+        // Usamos el índice de Updates si existe, sino el valor anterior
+        const valorUnitarioNew = updates.valor_unitario !== undefined ? round3(Number(updates.valor_unitario ?? 0)) : before.valor_unitario;
+        const cantidadNew = updates.cantidad !== undefined ? Number(updates.cantidad ?? 0) : before.cantidad;
+        const totalNew = round2((Number(cantidadNew) || 0) * (Number(valorUnitarioNew) || 0));
 
+        // Build SETs
         const sets: string[] = [];
         const vals: any[] = [];
         let idx = 1;
-        const allowed = [
-            'lote_id',
-            'piscina_id',
-            'fecha',
-            'tipo_alimento_id',
-            'cantidad',
-            'proveedor_id',
-            'nro_factura',
-            'valor_unitario',
-            'active',
-        ];
+        const allowed = ['lote_id','piscina_id','fecha','tipo_alimento_id','cantidad','proveedor_id','nro_factura','valor_unitario','active'];
+
+        // Iteración segura sobre las claves
         for (const key of Object.keys(updates)) {
             if (!allowed.includes(key)) continue;
-            // @ts‑expect‑error
             sets.push(`${key} = $${idx++}`);
-            // @ts‑expect‑error
+            // @ts-expect-error key is guaranteed to be in updates and allowed
             vals.push(updates[key]);
         }
+
+        // set total, editado_por, editado_en
         sets.push(`total = $${idx++}`); vals.push(totalNew);
         sets.push(`editado_por = $${idx++}`); vals.push(user.id);
-        sets.push(`editado_en = NOW()`);
+        sets.push(`editado_en = NOW()`); // no param
 
+        // final WHERE param (id)
         vals.push(id);
 
         const sql = `UPDATE alimentos SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`;
@@ -326,8 +312,8 @@ export async function PATCH(req: NextRequest, context: RouteHandlerContext) {
 
         await client.query(
             `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-             VALUES ($1,'alimentos',$2,'UPDATE',$3::jsonb)`,
-            [user.id, id, JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
+        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
+            [user.id, id, 'UPDATE', JSON.stringify({ old: beforeRes.rows[0], new: updRes.rows[0] })]
         );
 
         await client.query('COMMIT');
@@ -342,17 +328,20 @@ export async function PATCH(req: NextRequest, context: RouteHandlerContext) {
 }
 
 /** DELETE (soft) */
-export async function DELETE(req: NextRequest, context: RouteHandlerContext) {
-    const id = parseId(context.params.id);
-    if (!id) {
-        return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
-    }
+export async function DELETE(
+    req: NextRequest, 
+    // ¡CORRECCIÓN FINAL! Usamos 'any' para evitar el conflicto de tipado con Next.js
+    context: any 
+) {
+    const params = context.params;
+    const id = parseId(params?.id);
+    if (!id) return NextResponse.json({ success: false, msg: 'ID inválido' }, { status: 400 });
 
-    const auth = await requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
+    const auth = requireAuthApi(req, ['SUPERADMIN', 'OPERADOR']);
     if (auth instanceof NextResponse) return auth;
-
-    const user = auth as { id: number; role: string };
-    const role = (user.role ?? '').toUpperCase();
+    // Tipado más seguro para el usuario
+    const user = auth as { id: number; role: string; };
+    const role = (user.role ?? '').toString().toUpperCase();
 
     const client = await pool.connect();
     try {
@@ -385,8 +374,8 @@ export async function DELETE(req: NextRequest, context: RouteHandlerContext) {
 
         await client.query(
             `INSERT INTO auditoria (usuario_id, tabla, registro_id, accion, detalle)
-             VALUES ($1,'alimentos',$2,'DELETE',$3::jsonb)`,
-            [user.id, id, JSON.stringify({ old: beforeRes.rows[0], soft_delete: true })]
+        VALUES ($1,'alimentos',$2,$3::text,$4::jsonb)`,
+            [user.id, id, 'DELETE', JSON.stringify({ old: beforeRes.rows[0], soft_delete: true })]
         );
 
         await client.query('COMMIT');
