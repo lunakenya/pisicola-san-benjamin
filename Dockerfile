@@ -9,12 +9,8 @@ RUN apk add --no-cache python3 g++ make
 
 WORKDIR /app
 
-# Línea 1: Copia el archivo CRÍTICO (package.json). Si no está, debe fallar.
+# Copia SOLO el archivo CRÍTICO (package.json)
 COPY package.json ./ 
-
-# Línea 2: Copia archivos opcionales. El '|| true' permite que continúe si no se encuentran.
-# Esto es la corrección final para tu error:
-COPY .npmrc .nvmrc ./ || true 
 
 # Instala las dependencias de la aplicación usando npm
 RUN npm install
